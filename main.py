@@ -4,10 +4,11 @@ import numpy as np
 import random as r
 
 board = np.zeros((4,4))
-#board = np.array(([8,4,4,4],
-#                  [4,4,4,4], 
-#                  [4,4,4,4], 
-#                  [4,4,4,4]))
+checkBoard = np.zeros((4,4))
+#board = np.array(([2,4,8,16],
+#                  [32,64,128,256], 
+#                  [512,1024,2048,4096], 
+#                  [8192,16384,32768,65536]))
 clearSpace = []
 newBlockList = []
 gameEnd = 0
@@ -130,13 +131,19 @@ def rightMove(moved):
 
 
 def randBoard():
-    randVal = r.randint(1,2) * 2
+    
+    randVal = r.randint(0,3)
+    
+    if randVal != 0:
+        randBlock = 2
+    else:
+        randBlock = 4
     
     try:
         randSpace = r.randint(0, (len(clearSpace)-1))
         x = clearSpace[randSpace][0]
         y = clearSpace[randSpace][1]
-        board[x][y] = randVal
+        board[x][y] = randBlock
     except:
         global gameEnd
         gameEnd = 1
@@ -147,6 +154,14 @@ def reset():
     global board
     board = np.zeros((4,4))
     
+    global gameEnd 
+    gameEnd = 0
+    newBlockList.clear()
+    newBlockList.append(0)
+    
+    for i in range(2):
+        randBoard()
+    
     guiUpdate()
     infoUpdate(0)
     
@@ -155,7 +170,9 @@ def reset():
 def boardAction(direction):
     
     moved = [False, False, False, False] 
+    
     newBlockList.clear()
+    checkBoard= np.copy(board)
     
     if gameEnd == 0:
         if direction == "left":
@@ -166,12 +183,16 @@ def boardAction(direction):
             downMove(moved)
         elif direction == "up":
             upMove(moved)
-            
-    randBoard()
+    
     null_space()
     
+    if not np.array_equal(board,checkBoard):    
+        randBoard()
+    
+    
 
-
+for i in range(2):
+    randBoard()
 
 
 #GUI START ---------------------------
@@ -180,8 +201,8 @@ root.title("2048")
 root.geometry("540x960")
 root['background'] = '#faf8ef'
 
-root.minsize(540, 960)
-root.maxsize(540, 960)
+root.minsize(540, 750)
+root.maxsize(540, 750)
 
 fname = "Helvetica Neue"
 titleFont = font.Font(family=fname, size=50, weight='bold')
@@ -190,7 +211,8 @@ resetFont = font.Font(family=fname, size=15, weight='bold')
 numFontList = [font.Font(family=fname, size=45, weight='bold'),
                font.Font(family=fname, size=45, weight='bold'),
                font.Font(family=fname, size=40, weight='bold'),
-               font.Font(family=fname, size=30, weight='bold')] 
+               font.Font(family=fname, size=30, weight='bold'),
+               font.Font(family=fname, size=25, weight='bold')] 
 
 blockSize = 100
 blockPad = 5
@@ -239,12 +261,32 @@ def colorCheck():
         elif blockText == "128":
             for j in labelDict.get(i):
                 j.configure(bg="#edd073")
-                
+        elif blockText == "256":
+            for j in labelDict.get(i):
+                j.configure(bg="#edcc61")
+        elif blockText == "512":
+            for j in labelDict.get(i):
+                j.configure(bg="#edc851")
+        elif blockText == "1024":
+            for j in labelDict.get(i):
+                j.configure(bg="#edc53f")
+        elif blockText == "2048":
+            for j in labelDict.get(i):
+                j.configure(bg="#ecc22d")
+        elif blockText == "4096":
+            for j in labelDict.get(i):
+                j.configure(bg="#ebb914")
+        elif blockText == "8192":
+            for j in labelDict.get(i):
+                j.configure(bg="#d3a612")
+        else:
+            for j in labelDict.get(i):
+                j.configure(bg="#bc9410")
             
             
 def sizeCheck():
     for i in labelDict:
-        for j in range(1,5):
+        for j in range(1,6):
             if len(str(labelDict.get(i)[1].cget("text"))) == j:
                 
                 labelDict.get(i)[1].configure(font=numFontList[j-1])
@@ -313,7 +355,6 @@ root.bind('<Down>', downKey)
 
 infoFrame = LabelFrame(root, borderwidth=0, highlightthickness=0, bg="#faf8ef")
 infoFrame.grid(column=0, row=0, columnspan=10)
-
 
 
 titleLabel = Label(infoFrame, text="2048", font=titleFont, bg="#faf8ef", fg="#776e65")
@@ -505,6 +546,7 @@ labelDict = {0: [cr00Frame, cr00Label],
              14:[cr32Frame, cr32Label],
              15:[cr33Frame, cr33Label]
                 }
+
 guiUpdate()
 
 root.mainloop()
