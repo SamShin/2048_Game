@@ -9,11 +9,15 @@ board = np.zeros((4,4))
 #                  [4,4,4,4], 
 #                  [4,4,4,4]))
 clearSpace = []
+newBlockList = []
 gameEnd = 0
+newBlock = 0
+
 
 for i in range(4):
     for j in range(4):
         clearSpace.append(tuple((i,j)))
+  
   
         
 def null_space():
@@ -25,73 +29,104 @@ def null_space():
                 clearSpace.remove(tuple((i,j)))
 
 
+
 def print_board():
-    
     for row in board:
         string_row = str(row).replace("[", "").replace("]", "").replace(".", "")
         print(string_row)
     
-#print_board()    
+    
 
 def upMove(moved):
     for j in (range(4)):
         for correction in range(4):
             for i in (range(1,4)):
                 
+                global newBlock
+                newBlock = 0 
+                
                 if board[i-1][j] == 0 or (board[i-1][j] == board[i][j] and (not moved[i-1] and not moved[i])):
                     if((board[i-1][j] == board[i][j]) and (board[i-1][j] != 0)):
-                        moved[i-1] = True
                         
+                        newBlock = board[i-1][j]
+                        newBlockList.append(newBlock)
+
+                        moved[i-1] = True
+                      
                     board[i-1][j] += board[i][j]
                     board[i][j] = 0
-                    
+                
         moved = [False, False, False, False]
+    
+    
 
 def downMove(moved):
-
     for j in range(4):
         for correction in range(4):
             for i in reversed(range(0,3)):
                 
+                global newBlock
+                newBlock = 0
+                
                 if board[i+1][j] == 0 or (board[i+1][j] == board[i][j] and (not moved[i+1] and not moved[i])):
                     if((board[i+1][j] == board[i][j]) and (board[i+1][j] != 0)):
-                        moved[i+1] = True
                         
+                        newBlock = board[i+1][j]
+                        newBlockList.append(newBlock)
+                        
+                        moved[i+1] = True
+                    
                     board[i+1][j] += board[i][j]
                     board[i][j] = 0
+                                   
+        moved = [False, False, False, False]          
                     
-        moved = [False, False, False, False]
+        
 
 def leftMove(moved):
-    
     for i in range(4):
         for correction in range(4):
             for j in range(1,4):
                 
+                global newBlock
+                newBlock = 0
+                
                 if board[i][j-1] == 0 or (board[i][j-1] == board[i][j] and (not moved[j-1] and not moved[j])):
                     if ((board[i][j-1] == board[i][j]) and (board[i][j-1] != 0)):
-                        moved[j-1] = True  
                         
+                        newBlock = board[i][j-1]
+                        newBlockList.append(newBlock)
+                        
+                        moved[j-1] = True  
+
                     board[i][j-1] += board[i][j]
-                    board[i][j] = 0
+                    board[i][j] = 0  
                     
         moved = [False, False, False, False]
 
 
+
 def rightMove(moved):
-    
     for i in range(4):
         for correction in range(4):
             for j in reversed(range(0,3)):
                 
+                global newBlock
+                newBlock = 0 
+                
                 if board[i][j+1] == 0 or (board[i][j+1] == board[i][j] and (not moved[j+1] and not moved[j])):
                     if ((board[i][j+1] == board[i][j]) and (board[i][j+1] != 0)):
-                        moved[j+1] = True       
                         
-                    board[i][j+1] += board[i][j]
-                    board[i][j] = 0  
+                        newBlock = board[i][j+1]
+                        newBlockList.append(newBlock)
+                        
+                        moved[j+1] = True       
                     
+                    board[i][j+1] += board[i][j]
+                    board[i][j] = 0 
+                     
         moved = [False, False, False, False]
+
 
 
 def randBoard():
@@ -106,12 +141,21 @@ def randBoard():
         global gameEnd
         gameEnd = 1
     
+    
+    
+def reset():
+    global board
+    board = np.zeros((4,4))
+    
+    guiUpdate()
+    infoUpdate(0)
+    
 
 
 def boardAction(direction):
     
-    
     moved = [False, False, False, False] 
+    newBlockList.clear()
     
     if gameEnd == 0:
         if direction == "left":
@@ -123,34 +167,30 @@ def boardAction(direction):
         elif direction == "up":
             upMove(moved)
             
-    
     randBoard()
-    
     null_space()
     
-    print_board()
+
+
 
 
 #GUI START ---------------------------
 root = Tk()
+root.title("2048")
 root.geometry("540x960")
+root['background'] = '#faf8ef'
 
 root.minsize(540, 960)
 root.maxsize(540, 960)
 
-root.title("2048")
-
-root['background'] = '#faf8ef'
-titleFont = font.Font(family="Helvetica Neue", size=50, weight='bold')
-scoreFont = font.Font(family="Helvetica Neue", size=15, weight='bold')
-
-resetFont = font.Font(family="Helvetica Neue", size=15, weight='bold')
-
-numFontList = [font.Font(family="Helvetica Neue", size=45, weight='bold'),
-               font.Font(family="Helvetica Neue", size=45, weight='bold'),
-               font.Font(family="Helvetica Neue", size=40, weight='bold'),
-               font.Font(family="Helvetica Neue", size=30, weight='bold')]
-                         
+fname = "Helvetica Neue"
+titleFont = font.Font(family=fname, size=50, weight='bold')
+infoFont = font.Font(family=fname, size=20, weight='bold')
+resetFont = font.Font(family=fname, size=15, weight='bold')
+numFontList = [font.Font(family=fname, size=45, weight='bold'),
+               font.Font(family=fname, size=45, weight='bold'),
+               font.Font(family=fname, size=40, weight='bold'),
+               font.Font(family=fname, size=30, weight='bold')] 
 
 blockSize = 100
 blockPad = 5
@@ -160,125 +200,163 @@ titletextbg = '#808080'
 scorebg = "#808080"
 scorefg = "#faf8ef"
 boardbg = "#bbada0"
-numbg = "#ffffff"
-numfg =  "#000000"
+
+
 
 def colorCheck():
-    
     for i in labelDict:
 
         blockText = str(labelDict.get(i)[1].cget("text")) 
         
         if int(blockText) <= 5:
             for j in labelDict.get(i):
-                j.configure(fg = "#776e65")
+                j.configure(fg="#776e65")
         else:
             for j in labelDict.get(i):
-                j.configure(fg = "#f9f6f2")
+                j.configure(fg="#f9f6f2")
         
         if blockText == "0":
             for j in labelDict.get(i):
-                j.configure(text = "", bg = "#ccc1b4")
+                j.configure(text="", bg="#ccc1b4")
         elif blockText == "2":
             for j in labelDict.get(i):
-                j.configure(bg = "#efe4da")
+                j.configure(bg="#efe4da")
         elif blockText == "4":
             for j in labelDict.get(i):
-                j.configure(bg = "#eee1c9")
+                j.configure(bg="#eee1c9")
         elif blockText == "8":
             for j in labelDict.get(i):
-                j.configure(bg = "#f4b27a")
+                j.configure(bg="#f4b27a")
         elif blockText == "16":
             for j in labelDict.get(i):
-                j.configure(bg = "#f79664")
+                j.configure(bg="#f79664")
         elif blockText == "32":
             for j in labelDict.get(i):
-                j.configure(bg = "#f87c5f")
+                j.configure(bg="#f87c5f")
         elif blockText == "64":
             for j in labelDict.get(i):
-                j.configure(bg = "#f75f3b")
+                j.configure(bg="#f75f3b")
         elif blockText == "128":
             for j in labelDict.get(i):
-                j.configure(bg = "#edd073")
+                j.configure(bg="#edd073")
                 
             
+            
 def sizeCheck():
-
     for i in labelDict:
         for j in range(1,5):
             if len(str(labelDict.get(i)[1].cget("text"))) == j:
-                labelDict.get(i)[1].configure(font = numFontList[j-1])
+                
+                labelDict.get(i)[1].configure(font=numFontList[j-1])
+
+
 
 def numUpdate():
-    for i in range(4):
-        
+    for i in range(4): 
         for j in range(4):
             val = board[i][j]
-            position = 4*i + j
+            position = 4*i +j
             
-            labelDict.get(position)[1].configure(text = int(val))
-            
+            labelDict.get(position)[1].configure(text=int(val))
+
+
+
+def infoUpdate(val=None):
+    best = int(actualBestLabel.cget("text"))
+    score = int(actualScoreLabel.cget("text"))
+    
+    score += int(sum(newBlockList))*2
+    actualScoreLabel.configure(text=score)
+    
+    if (score >= best):
+        actualBestLabel.configure(text=score)
+    
+    actualScoreLabel.configure(text=val)
+    
+    
+    
             
 def guiUpdate():
+    
     numUpdate()
     colorCheck()
     sizeCheck()
+    infoUpdate()
+    
+    
     
 def leftKey(event):
     
     boardAction("left")
     guiUpdate()
-    print ("Left key pressed")
 
 def rightKey(event):
     boardAction("right")
     guiUpdate()
-    print ("Right key pressed")
 
 def upKey(event):
     boardAction("up")
     guiUpdate()
-    print("up key pressed")
     
 def downKey(event):
     boardAction("down")
     guiUpdate()
-    print("down key pressed")
+   
+   
     
 root.bind('<Left>', leftKey)
 root.bind('<Right>', rightKey)
 root.bind('<Up>', upKey)
 root.bind('<Down>', downKey)
 
-#<0th row Frame>
-infoFrame = LabelFrame(root, text="test frame")
+
+
+infoFrame = LabelFrame(root, borderwidth=0, highlightthickness=0, bg="#faf8ef")
 infoFrame.grid(column=0, row=0, columnspan=10)
 
-#Label widget 
-titleLabel = Label(infoFrame, text="2048", font=titleFont)
-titleLabel.grid(column=0,row=0, columnspan=2)
 
-#Label widget
-bScoreLabel = Label(infoFrame, text="bScoreLabel\n 128080", font=scoreFont)
-bScoreLabel.grid(column=3, row=0, padx=(50,0))
 
-#Label widget
-scoreLabel = Label(infoFrame, text="scoreLabel\n 128000", font=scoreFont)
-scoreLabel.grid(column=4, row=0, padx=(25,0))
+titleLabel = Label(infoFrame, text="2048", font=titleFont, bg="#faf8ef", fg="#776e65")
+titleLabel.grid(column=0,row=0, columnspan=2, padx=(25,0), pady=(50,0))
+
+
+scoreFrame = LabelFrame(infoFrame, width=120, height=50, borderwidth=0, highlightthickness=0, bg="#bbada0")
+scoreFrame.grid(column=3, row=0, padx=(50,0))
+scoreFrame.grid_propagate(0)
+
+scoreLabel = Label(scoreFrame, text="SCORE", bg="#bbada0", fg="#efe4da")
+scoreLabel.place(x=60, y=10, anchor=CENTER)
+
+actualScoreLabel = Label(scoreFrame, text="0", font=infoFont, bg="#bbada0", fg="#ffffff")
+actualScoreLabel.place(x=60, y=35, anchor=CENTER)
+
+
+bestFrame = LabelFrame(infoFrame, width=120, height=50, borderwidth=0, highlightthickness=0,bg ="#bbada0")
+bestFrame.grid(column=4, row=0, padx=(25,0))
+bestFrame.grid_propagate(0)
+
+bestLabel = Label(bestFrame, text="BEST", bg="#bbada0", fg="#efe4da")
+bestLabel.place(x=60, y=10, anchor=CENTER)
+
+actualBestLabel = Label(bestFrame, text="0", font=infoFont, bg="#bbada0", fg="#ffffff")
+actualBestLabel.place(x=60, y=35, anchor=CENTER)
+
+
 
 #-----------------------
 #<1st row Frame>
-resetFrame = LabelFrame(root, text="resetFrame")
+resetFrame = LabelFrame(root, bg="#faf8ef", borderwidth=0, highlightthickness=0)
 resetFrame.grid(column=0, row=1, columnspan=10)
 
 #Button widget
-resetButton = Button(resetFrame, text="New Game", font=resetFont)
-resetButton.grid(column=0, row=0, padx=(300,0))
+resetButton = Button(resetFrame, text="New Game", font=resetFont, bg="#8e7a66", fg="#f9f6f2", activebackground="#8e7a66", 
+                     activeforeground="#f9f6f2", border=0, highlightthickness=0, command=lambda: reset())
+resetButton.grid(column=0, row=0, padx=(300,0), pady=(30,0))
 
 #-----------------------
 #<3rd row Frame>
-boardFrame = LabelFrame(root, text="", bg=boardbg)
-boardFrame.grid(column=0, row=2, columnspan=10, padx=(27,0), pady=(50,0))
+boardFrame = LabelFrame(root, bg=boardbg)
+boardFrame.grid(column=0, row=2, columnspan=10, padx=(45,0), pady=(50,0))
 
 
 cr00Frame = LabelFrame(boardFrame, width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
@@ -290,35 +368,35 @@ cr00Label.place(x=blockSize/2, y=blockSize/2, anchor=CENTER)
 
 
 cr01Frame = LabelFrame(boardFrame, width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
-cr01Frame.grid(column=1, row=0, padx=blockPad,pady=blockPad)
+cr01Frame.grid(column=1, row=0, padx=blockPad, pady=blockPad)
 cr01Frame.grid_propagate(0)
 
 cr01Label = Label(cr01Frame)
-cr01Label.place(x=blockSize/2,y=blockSize/2,anchor=CENTER)
+cr01Label.place(x=blockSize/2, y=blockSize/2, anchor=CENTER)
 
 
-cr02Frame = LabelFrame(boardFrame, text="", width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
-cr02Frame.grid(column=2, row=0, padx=blockPad,pady=blockPad)
+cr02Frame = LabelFrame(boardFrame, width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
+cr02Frame.grid(column=2, row=0, padx=blockPad, pady=blockPad)
 cr02Frame.grid_propagate(0)
 
 cr02Label = Label(cr02Frame)
-cr02Label.place(x=blockSize/2,y=blockSize/2 ,anchor=CENTER)
+cr02Label.place(x=blockSize/2, y=blockSize/2 ,anchor=CENTER)
 
 
-cr03Frame = LabelFrame(boardFrame, text="", width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
-cr03Frame.grid(column=3, row=0, padx=blockPad,pady=blockPad)
+cr03Frame = LabelFrame(boardFrame, width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
+cr03Frame.grid(column=3, row=0, padx=blockPad, pady=blockPad)
 cr03Frame.grid_propagate(0)
 
 cr03Label = Label(cr03Frame)
-cr03Label.place(x=blockSize/2,y=blockSize/2 - 10,anchor=CENTER)
+cr03Label.place(x=blockSize/2, y=blockSize/2 ,anchor=CENTER)
 
 
-cr10Frame = LabelFrame(boardFrame, text="", width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
-cr10Frame.grid(column=0, row=1, padx=blockPad,pady=blockPad)
+cr10Frame = LabelFrame(boardFrame, width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
+cr10Frame.grid(column=0, row=1, padx=blockPad, pady=blockPad)
 cr10Frame.grid_propagate(0)
 
 cr10Label = Label(cr10Frame)
-cr10Label.place(x=blockSize/2,y=blockSize/2 - 10,anchor=CENTER)
+cr10Label.place(x=blockSize/2, y=blockSize/2, anchor=CENTER)
 
 
 cr11Frame=LabelFrame(boardFrame, width=blockSize, height=blockSize, borderwidth=0, highlightthickness=0)
@@ -427,27 +505,15 @@ labelDict = {0: [cr00Frame, cr00Label],
              14:[cr32Frame, cr32Label],
              15:[cr33Frame, cr33Label]
                 }
+guiUpdate()
 
 root.mainloop()
 
 
 
-#TODO Bad news... row movements are in the wrong order: ex) If I move left and there are two elements in a same row,
-#the program currently moves from the farthest row to the cloest row, so the back element is blocked by the element
-#in the front, while the front element is not blocked so it moves leaving a space in between
-# 0 0 2 4 (Before state)
-# 0 2 0 4 (outcome)
-# 2 4 0 0 (expected)
+#TODO The GUI is mostly working 
+#Fix the bug where the block sometimes goes missing (I think it has something to do with clearSpace not indexing clear spaces not clearly)
+#how to reset the score when you press the button, 
 
-#gameEnd currently stops board operations if board is full, make sure this ends the current game 
-
-#Each block has its own bg, fg, fontSize, etc, attached to it, the goal is to check the gui against the np array
-#and to update the gui as the array updates, each element in the 4x4 np array corosponds to a block in gui
-#using if else (at least right now) if that spot in array is 2 digit, update font for that block etc.
-
-
-
-#TODO Try dict to store all the values 
-
-#Current goal is to have a dict of list of attributes of each block (bg, fg, fontSize, )
-
+#maybe a better window size?
+#TODO Better beginning sequence, originall game has two blocks in the board when you start, make that happen 
