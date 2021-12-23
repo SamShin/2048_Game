@@ -145,6 +145,7 @@ def randBoard():
         y = clearSpace[randSpace][1]
         board[x][y] = randBlock
     except:
+        print("error")
         global gameEnd
         gameEnd = 1
     
@@ -158,6 +159,8 @@ def reset():
     gameEnd = 0
     newBlockList.clear()
     newBlockList.append(0)
+    
+    null_space()
     
     for i in range(2):
         randBoard()
