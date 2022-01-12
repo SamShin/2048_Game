@@ -5,10 +5,7 @@ import random as r
 
 board = np.zeros((4,4))
 checkBoard = np.zeros((4,4))
-#board = np.array(([2,4,8,16],
-#                  [32,64,128,256], 
-#                  [512,1024,2048,4096], 
-#                  [8192,16384,32768,65536]))
+
 clearSpace = []
 newBlockList = []
 gameEnd = 0
@@ -198,7 +195,7 @@ for i in range(2):
     randBoard()
 
 
-#GUI START ---------------------------
+
 root = Tk()
 root.title("2048")
 root.geometry("540x960")
@@ -387,18 +384,18 @@ actualBestLabel.place(x=60, y=35, anchor=CENTER)
 
 
 
-#-----------------------
-#<1st row Frame>
+
 resetFrame = LabelFrame(root, bg="#faf8ef", borderwidth=0, highlightthickness=0)
 resetFrame.grid(column=0, row=1, columnspan=10)
 
-#Button widget
+
+
 resetButton = Button(resetFrame, text="New Game", font=resetFont, bg="#8e7a66", fg="#f9f6f2", activebackground="#8e7a66", 
                      activeforeground="#f9f6f2", border=0, highlightthickness=0, command=lambda: reset())
 resetButton.grid(column=0, row=0, padx=(300,0), pady=(30,0))
 
-#-----------------------
-#<3rd row Frame>
+
+
 boardFrame = LabelFrame(root, bg=boardbg)
 boardFrame.grid(column=0, row=2, columnspan=10, padx=(45,0), pady=(50,0))
 
@@ -553,12 +550,3 @@ labelDict = {0: [cr00Frame, cr00Label],
 guiUpdate()
 
 root.mainloop()
-
-
-
-#TODO The GUI is mostly working 
-#Fix the bug where the block sometimes goes missing (I think it has something to do with clearSpace not indexing clear spaces not clearly)
-#how to reset the score when you press the button, 
-
-#maybe a better window size?
-#TODO Better beginning sequence, originall game has two blocks in the board when you start, make that happen 
